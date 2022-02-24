@@ -14,8 +14,8 @@ router.get('/github-signin', checkConnectivity, async (req, res) => {
     const response = await axios.post(
       'https://github.com/login/oauth/access_token',
       {
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
+        client_id: process.env.GITHUB_CLIENT_ID,
+        client_secret: process.env.GITHUB_CLIENT_SECRET,
         code,
         state,
       },
@@ -245,6 +245,7 @@ const createUserInDatabase = async (user) => {
       msg: 'successful',
     };
   } catch (err) {
+    console.log(err);
     return {
       errorMsg: 'Server Error: Failed to create account.',
       status: 500,
