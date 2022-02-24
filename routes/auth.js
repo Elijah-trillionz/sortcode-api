@@ -97,7 +97,7 @@ router.get('/discord-signin/:code', checkConnectivity, async (req, res) => {
   try {
     const accessToken = await axios.post(
       'https://discord.com/api/v8/oauth2/token',
-      `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=https://ancient-stream-15771.herokuapp.com/sign-in`,
+      `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=https://initial-sortcode.vercel.app/sign-in`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
