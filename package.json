@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "server": "nodemon server",
-    "start": "node server"
+    "start": "node server",
+    "heroku-postbuild": "echo $sortcode | base64 -d > config/sortcode.json"
   },
   "author": "Elijah Trillionz",
   "license": "MIT",
