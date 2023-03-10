@@ -1,15 +1,15 @@
-const express = require('express');
-const db = require('../config/firebase');
-const auth = require('../middlewares/auth');
-const { firestore } = require('firebase-admin');
-const checkConnectivity = require('../middlewares/checkConnectivity');
-const getQuestionsFromDB = require('../magnus-api/functions/questions');
+const express = require("express");
+const db = require("../config/firebase");
+const auth = require("../middlewares/auth");
+const { firestore } = require("firebase-admin");
+const checkConnectivity = require("../middlewares/checkConnectivity");
+const getQuestionsFromDB = require("../magnus-api/functions/questions");
 const router = express.Router();
 
 // @mtd      GET /api/questions/lang/:language
 // @desc     get the total no of tasks
 // @access   private
-router.get('/lang/:language', checkConnectivity, auth, async (req, res) => {
+router.get("/lang/:language", checkConnectivity, auth, async (req, res) => {
   const { language } = req.params;
 
   try {
@@ -31,7 +31,7 @@ router.get('/lang/:language', checkConnectivity, auth, async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      errorMsg: 'Server Error: Try reloading',
+      errorMsg: "Server Error: Try reloading",
       error: err,
     });
   }
@@ -40,11 +40,11 @@ router.get('/lang/:language', checkConnectivity, auth, async (req, res) => {
 // @mtd      GET
 // @route    /api/questions/index
 // @desc     get the current questionNo of user
-router.get('/index', checkConnectivity, auth, async (req, res) => {
+router.get("/index", checkConnectivity, auth, async (req, res) => {
   const { id } = req.user;
 
   try {
-    const user = await db.collection('users').doc(`${id}`).get();
+    const user = await db.collection("users").doc(`${id}`).get();
 
     res.json({
       questions: user.data().questionsAnswered,
@@ -60,7 +60,7 @@ router.get('/index', checkConnectivity, auth, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      errorMsg: 'Server Error: Try reloading',
+      errorMsg: "Server Error: Try reloading",
       error: err,
     });
   }
@@ -69,35 +69,35 @@ router.get('/index', checkConnectivity, auth, async (req, res) => {
 // @mtd      GET
 // @route    /api/questions/update
 // @desc     increment the no of questions answered for user
-router.get('/update/:language', checkConnectivity, auth, async (req, res) => {
+router.get("/update/:language", checkConnectivity, auth, async (req, res) => {
   const { id } = req.user;
 
   const { language } = req.params;
 
   if (!language) {
     res.status(400).json({
-      errorMsg: 'Unable to get language. Report issue',
+      errorMsg: "Unable to get language. Report issue",
     });
     return;
   }
 
   try {
-    const userRef = db.collection('users').doc(`${id}`);
+    const userRef = db.collection("users").doc(`${id}`);
 
     switch (language) {
-      case 'html':
+      case "html":
         await userRef.update({
           questionsAnswered: firestore.FieldValue.increment(1),
           htmlAnsweredQuestions: firestore.FieldValue.increment(1),
         });
         break;
-      case 'css':
+      case "css":
         await userRef.update({
           questionsAnswered: firestore.FieldValue.increment(1),
           cssAnsweredQuestions: firestore.FieldValue.increment(1),
         });
         break;
-      case 'javascript':
+      case "javascript":
         await userRef.update({
           questionsAnswered: firestore.FieldValue.increment(1),
           javascriptAnsweredQuestions: firestore.FieldValue.increment(1),
@@ -113,14 +113,14 @@ router.get('/update/:language', checkConnectivity, auth, async (req, res) => {
     const user = await userRef.get();
 
     res.json({
-      msg: 'updated successfully',
+      msg: "updated successfully",
       javascriptAnsweredQuestions: user.data().javascriptAnsweredQuestions,
       htmlAnsweredQuestions: user.data().htmlAnsweredQuestions,
       cssAnsweredQuestions: user.data().cssAnsweredQuestions,
     });
   } catch (err) {
     res.status(500).json({
-      errorMsg: 'Server error, unable to make updates',
+      errorMsg: "Server error, unable to make updates",
       error: err,
     });
   }
@@ -129,18 +129,18 @@ router.get('/update/:language', checkConnectivity, auth, async (req, res) => {
 // @mtd      GET
 // @route    /api/questions/score
 // @desc     get the current total score
-router.get('/score', checkConnectivity, auth, async (req, res) => {
+router.get("/score", checkConnectivity, auth, async (req, res) => {
   const { id } = req.user;
 
   try {
-    const user = await db.collection('users').doc(`${id}`).get();
+    const user = await db.collection("users").doc(`${id}`).get();
 
     res.json({
       score: user.data().score,
     });
   } catch (err) {
     res.status(500).json({
-      errorMsg: 'Server Error: Failed to load current score',
+      errorMsg: "Server Error: Failed to load current score",
       error: err,
     });
   }
@@ -149,11 +149,11 @@ router.get('/score', checkConnectivity, auth, async (req, res) => {
 // @mtd      GET
 // @route    /api/questions/score/update
 // @desc     increment no of scores by 5
-router.get('/score/update', checkConnectivity, auth, async (req, res) => {
+router.get("/score/update", checkConnectivity, auth, async (req, res) => {
   const { id } = req.user;
 
   try {
-    const userRef = db.collection('users').doc(`${id}`);
+    const userRef = db.collection("users").doc(`${id}`);
 
     await userRef.update({
       score: firestore.FieldValue.increment(5),
@@ -166,7 +166,7 @@ router.get('/score/update', checkConnectivity, auth, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      errorMsg: 'Server Error: Failed to increment score.',
+      errorMsg: "Server Error: Failed to increment score.",
       error: err,
     });
   }

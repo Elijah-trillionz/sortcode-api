@@ -1,18 +1,18 @@
-const express = require('express');
-const db = require('../config/firebase');
-const axios = require('axios').default;
-const auth = require('../middlewares/auth');
-const checkConnectivity = require('../middlewares/checkConnectivity');
+const express = require("express");
+const db = require("../config/firebase");
+const axios = require("axios").default;
+const auth = require("../middlewares/auth");
+const checkConnectivity = require("../middlewares/checkConnectivity");
 const router = express.Router();
 
 // GET: /auth/github-signin
 // ACCESS: public
-router.get('/github-signin', checkConnectivity, async (req, res) => {
+router.get("/github-signin", checkConnectivity, async (req, res) => {
   const { code, state } = req.query;
 
   try {
     const response = await axios.post(
-      'https://github.com/login/oauth/access_token',
+      "https://github.com/login/oauth/access_token",
       {
         client_id: process.env.GITHUB_CLIENT_ID,
         client_secret: process.env.GITHUB_CLIENT_SECRET,
@@ -21,7 +21,7 @@ router.get('/github-signin', checkConnectivity, async (req, res) => {
       },
       {
         headers: {
-          Accept: 'application/json',
+          Accept: "application/json",
         },
       }
     );
@@ -43,12 +43,12 @@ router.get('/github-signin', checkConnectivity, async (req, res) => {
 
     res.json({
       token,
-      msg: 'All done',
+      msg: "All done",
     });
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      errorMsg: 'Failed to fetch sign in user.',
+      errorMsg: "Failed to fetch sign in user.",
       error: err,
     });
   }
@@ -58,7 +58,7 @@ router.get('/github-signin', checkConnectivity, async (req, res) => {
 // verify that the token returns a user
 const verifyGithubToken = async (token) => {
   try {
-    const res = await axios.get('https://api.github.com/user', {
+    const res = await axios.get("https://api.github.com/user", {
       headers: {
         Authorization: `token ${token}`,
       },
@@ -66,14 +66,14 @@ const verifyGithubToken = async (token) => {
 
     if (!res.data.login) {
       return {
-        errorMsg: 'Invalid token, authentication failed',
+        errorMsg: "Invalid token, authentication failed",
       };
     }
 
     const { name, id, login, avatar_url } = res.data;
 
     return {
-      msg: 'Login Successful',
+      msg: "Login Successful",
       user: {
         fullname: name,
         id,
@@ -84,23 +84,23 @@ const verifyGithubToken = async (token) => {
   } catch (err) {
     console.log(err);
     return {
-      errorMsg: 'Authentication failed',
+      errorMsg: "Authentication failed",
     };
   }
 };
 
 // GET /auth/discord-signin/:code
 // ACCESS: public
-router.get('/discord-signin/:code', checkConnectivity, async (req, res) => {
+router.get("/discord-signin/:code", checkConnectivity, async (req, res) => {
   const { code } = req.params;
 
   try {
     const accessToken = await axios.post(
-      'https://discord.com/api/v8/oauth2/token',
-      `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=https://initial-sortcode.vercel.app/sign-in`,
+      "https://discord.com/api/v8/oauth2/token",
+      `client_id=${process.env.DISCORD_CLIENT_ID}&client_secret=${process.env.DISCORD_CLIENT_SECRET}&grant_type=authorization_code&code=${code}&redirect_uri=https://sortcode.vercel.app/sign-in`,
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
@@ -120,7 +120,7 @@ router.get('/discord-signin/:code', checkConnectivity, async (req, res) => {
     }
 
     res.json({
-      msg: 'All done',
+      msg: "All done",
       token: accessToken.data.access_token,
       refreshToken: accessToken.data.refresh_token,
       expiresIn: accessToken.data.expires_in,
@@ -128,7 +128,7 @@ router.get('/discord-signin/:code', checkConnectivity, async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      errorMsg: 'Failed to sign in user.',
+      errorMsg: "Failed to sign in user.",
       error: err,
     });
   }
@@ -144,14 +144,14 @@ const verifyDiscordToken = async (tokenToVerify) => {
 
     if (!res.data.username) {
       return {
-        errorMsg: 'Invalid token, authentication failed',
+        errorMsg: "Invalid token, authentication failed",
       };
     }
 
     const { username, id, avatar } = res.data;
 
     return {
-      msg: 'Login Successful',
+      msg: "Login Successful",
       user: {
         fullname: username,
         id,
@@ -161,7 +161,7 @@ const verifyDiscordToken = async (tokenToVerify) => {
     };
   } catch (err) {
     return {
-      errorMsg: 'Authentication failed',
+      errorMsg: "Authentication failed",
     };
   }
 };
@@ -176,7 +176,7 @@ const generateUsername = async (name) => {
   for (let i = 0; i <= 4; i++) {
     numbers.push(randomise());
   }
-  const username = `name${numbers.join('')}`; //adds the four numbers to make up a new username
+  const username = `name${numbers.join("")}`; //adds the four numbers to make up a new username
   const alreadyExists = await checkForUsername(username); // checks if the new username exists
   if (alreadyExists) {
     generateUsername(name); // redo
@@ -187,8 +187,8 @@ const generateUsername = async (name) => {
 
 const checkForUsername = async (username) => {
   const users = await db
-    .collection('users')
-    .where('username', '==', username)
+    .collection("users")
+    .where("username", "==", username)
     .get();
   if (users.empty) {
     return false;
@@ -202,13 +202,13 @@ const createUserInDatabase = async (user) => {
   // check if user already exists
   try {
     const usersCol = await db
-      .collection('users')
-      .where('id', '==', id.toString())
+      .collection("users")
+      .where("id", "==", id.toString())
       .get();
 
     if (!usersCol.empty) {
       return {
-        errorMsg: 'This user already exists',
+        errorMsg: "This user already exists",
         status: 400,
       };
       // users already existing are regarded as database logging in and therefore will only exit this function
@@ -221,7 +221,7 @@ const createUserInDatabase = async (user) => {
 
     // database signing up
     await db
-      .collection('users')
+      .collection("users")
       .doc(id.toString())
       .set({
         id: id.toString(),
@@ -242,12 +242,12 @@ const createUserInDatabase = async (user) => {
       });
 
     return {
-      msg: 'successful',
+      msg: "successful",
     };
   } catch (err) {
     console.log(err);
     return {
-      errorMsg: 'Server Error: Failed to create account.',
+      errorMsg: "Server Error: Failed to create account.",
       status: 500,
     };
   }
@@ -255,19 +255,19 @@ const createUserInDatabase = async (user) => {
 
 // GET: /auth/user
 // ACCESS: private
-router.get('/user', checkConnectivity, auth, async (req, res) => {
+router.get("/user", checkConnectivity, auth, async (req, res) => {
   const { id: userId } = req.user;
 
   // use the id to get the signed in user from token
   try {
-    const userData = await db.collection('users').doc(`${userId}`).get();
+    const userData = await db.collection("users").doc(`${userId}`).get();
 
     res.json({
       signedInUser: userData.data(),
     });
   } catch (err) {
     res.status(500).json({
-      errorMsg: 'Server error: Failed to fetch your data.',
+      errorMsg: "Server error: Failed to fetch your data.",
       error: err,
     });
   }

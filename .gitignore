@@ -2,3 +2,5 @@
 /config/default.json
 /config/sortcode.json
 .env
+tests.http
+/.idea
