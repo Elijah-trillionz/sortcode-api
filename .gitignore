@@ -4,3 +4,4 @@
 .env
 tests.http
 /.idea
+package-lock.json
