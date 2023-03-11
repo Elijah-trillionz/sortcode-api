@@ -1,6 +1,5 @@
-const admin = require('firebase-admin');
-
-const serviceAccount = require('./sortcode.json');
+const admin = require("firebase-admin");
+const serviceAccount = require("./sortcode.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

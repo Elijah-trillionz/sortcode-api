@@ -1,8 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/mongodb");
-const bcrypt = require("bcryptjs");
 require("dotenv").config();
+const fs = require("fs");
+
+const createServiceAccountJSONFile = () => {
+  const fileExists = fs.existsSync("./config/sortcode.json");
+  if (!fileExists) {
+    fs.writeFileSync(
+      "./config/sortcode.json",
+      atob(process.env.SERVICE_ACCOUNT)
+    );
+  }
+};
+createServiceAccountJSONFile();
 
 connectDB();
 
